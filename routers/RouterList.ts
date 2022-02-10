@@ -41,7 +41,6 @@ export class RouterList implements IRouter {
     /**
      * Adds router to list. Router must implement `IRouter` interface.
      * Router can be your custom class or instance of `PatternRouter`, `MaskRouter` or `RegExpRouter`.
-     * @param router 
      */
     addRouter(router: IRouter): void {
         // Force transform to return promises. 
@@ -52,6 +51,19 @@ export class RouterList implements IRouter {
     }
 
 
+    /**
+     * Adds new instance of router depending on `entry` argument.
+     * 
+     * - If is type of `string`.
+     *  It will be used as *mask* for `MaskRouter`.
+     * 
+     * - If is type of `URLPattern`.
+     *  It will be used as *pattern* for `PatternRouter`.
+     * 
+     * - If is type of `RegExp`.
+     *  It will be used as *regexp* for `RegExpRouter`.
+     * 
+     */
     add(entry: string | URLPattern | RegExp, serveResponse: ServeResponseType): void {
         if (typeof entry === "string") {
             this.#addMaskRoute(entry, serveResponse);
