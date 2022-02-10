@@ -11,6 +11,19 @@ import { RegExpRouter } from "./RegExpRouter.ts";
 import { MaskRouter } from "./MaskRouter.ts";
 
 
+/**
+ * Class `RouterList` is main object. Contains all routers.
+ * 
+ * ```ts
+ * const router = new RouterList();
+ * 
+ * // ...
+ * 
+ * if (router.match(request)) {
+ *    const response = await router.serveResponse(request);
+ * }
+ * ```
+ */
 export class RouterList implements IRouter {
 
     readonly #options: Required<RouterOptions>;
@@ -25,6 +38,12 @@ export class RouterList implements IRouter {
     }
 
 
+    /**
+     * Adds router to list. Router must implement `IRouter` interface.
+     * Router can be your custom class or instance of `PatternRouter`, `MaskRouter` or `RegExpRouter`.
+     * 
+     * Btw, also you can add another instance of `RouterList` too.
+     */
     addRouter(router: IRouter): void {
         // Force transform to return promises. 
         const match = async (req: Request) => await router.match(req);
@@ -34,6 +53,19 @@ export class RouterList implements IRouter {
     }
 
 
+    /**
+     * Adds new instance of router depending on `entry` argument.
+     * 
+     * - If is type of `string`.
+     *  It will be used as *mask* for `MaskRouter`.
+     * 
+     * - If is type of `URLPattern`.
+     *  It will be used as *pattern* for `PatternRouter`.
+     * 
+     * - If is type of `RegExp`.
+     *  It will be used as *regexp* for `RegExpRouter`.
+     * 
+     */
     add(entry: string | URLPattern | RegExp, serveResponse: ServeResponseType): void {
         if (typeof entry === "string") {
             this.#addMaskRoute(entry, serveResponse);
