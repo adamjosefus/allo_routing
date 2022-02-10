@@ -25,6 +25,15 @@ export class RouterList implements IRouter {
     }
 
 
+    addRouter(router: IRouter): void {
+        // Force transform to return promises. 
+        const match = async (req: Request) => await router.match(req);
+        const serveResponse = async (req: Request) => await router.serveResponse(req);
+
+        this.#routers.push({ match, serveResponse });
+    }
+
+
     add(entry: string | URLPattern | RegExp, serveResponse: ServeResponseType): void {
         if (typeof entry === "string") {
             this.#addMaskRoute(entry, serveResponse);
@@ -60,15 +69,6 @@ export class RouterList implements IRouter {
     #addRegExpRoute(regexp: RegExp, serveResponse: ServeResponseType): void {
         const router = new RegExpRouter(regexp, serveResponse, this.#options);
         this.addRouter(router);
-    }
-
-
-    addRouter(router: IRouter): void {
-        // Force transform to return promises. 
-        const match = async (req: Request) => await router.match(req);
-        const serveResponse = async (req: Request) => await router.serveResponse(req);
-
-        this.#routers.push({ match, serveResponse });
     }
 
 
