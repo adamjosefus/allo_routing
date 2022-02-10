@@ -41,6 +41,8 @@ export class RouterList implements IRouter {
     /**
      * Adds router to list. Router must implement `IRouter` interface.
      * Router can be your custom class or instance of `PatternRouter`, `MaskRouter` or `RegExpRouter`.
+     * 
+     * Btw, also you can add another instance of `RouterList` too.
      */
     addRouter(router: IRouter): void {
         // Force transform to return promises. 
