@@ -73,7 +73,7 @@ export class MaskRouter extends Router implements IRouter {
         if (paramValues === null) {
             throw new Error("No param values parsed");
         }
-        
+
         for (const [name, { value }] of paramValues) {
             if (value === null) continue;
 
