@@ -11,6 +11,19 @@ import { RegExpRouter } from "./RegExpRouter.ts";
 import { MaskRouter } from "./MaskRouter.ts";
 
 
+/**
+ * Class `RouterList` is main object. Contains all routers.
+ * 
+ * ```ts
+ * const router = new RouterList();
+ * 
+ * // ...
+ * 
+ * if (router.match(request)) {
+ *    const response = await router.serveResponse(request);
+ * }
+ * ```
+ */
 export class RouterList implements IRouter {
 
     readonly #options: Required<RouterOptions>;
