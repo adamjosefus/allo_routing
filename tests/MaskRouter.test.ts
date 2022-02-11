@@ -81,7 +81,7 @@ Deno.test("MaskRouter::match", async () => {
         },
         {
             mask: "[<presenter>[/<action>]]",
-            pathname: ["", "homepage", "homepage/profile", "contact", "contact/detail", "contact/map"],
+            pathname: ["", "Homepage", "Homepage/profile", "contact", "contact/detail", "contact/map"],
             expectation: true,
         },
     ];
@@ -122,25 +122,25 @@ Deno.test("MaskRouter::parseParams", async () => {
         },
         {
             mask: "<presenter>/<action>",
-            pathname: "homepage/default",
+            pathname: "Homepage/default",
             expectation: {
-                presenter: "homepage",
+                presenter: "Homepage",
                 action: "default",
             },
         },
         {
             mask: "<presenter>[/<action>]",
-            pathname: "homepage/default",
+            pathname: "Homepage/default",
             expectation: {
-                presenter: "homepage",
+                presenter: "Homepage",
                 action: "default",
             },
         },
         {
             mask: "<presenter>[/<action>]",
-            pathname: "homepage",
+            pathname: "Homepage",
             expectation: {
-                presenter: "homepage",
+                presenter: "Homepage",
             },
         },
     ];
