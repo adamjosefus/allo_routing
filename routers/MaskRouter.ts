@@ -39,7 +39,7 @@ export class MaskRouter extends Router implements IRouter {
     readonly #maskParser = /\<(?<name>[a-z][A-z0-9]*)(=(?<defaultValue>.+?))?\s*(\s+(?<expression>.+?))?\>/g;
 
     readonly #matchCache = new Cache<boolean>();
-    readonly #varialibityCache = new Cache<string[]>();
+    readonly #varietyCache = new Cache<string[]>();
     readonly #paramParserCache = new Cache<RegExp>();
     readonly #paramDeclarationCache = new Cache<ParamDeclarationsType>();
     readonly #paramValuesCache = new Cache<ParamValuesType | null>();
@@ -48,7 +48,7 @@ export class MaskRouter extends Router implements IRouter {
     constructor(mask: string, serveResponse: ServeResponseType, options?: RouterOptions) {
         super();
 
-        this.#masks = this.#parseVarialibity(MaskRouter.cleanPathname(mask));
+        this.#masks = this.#parseVariety(MaskRouter.cleanPathname(mask));
         this.#serveResponse = serveResponse;
         this.#options = createRequiredOptions(options);
     }
@@ -225,7 +225,7 @@ export class MaskRouter extends Router implements IRouter {
     }
 
 
-    #parseVarialibity(mask: string): string[] {
+    #parseVariety(mask: string): string[] {
         const parse = (mask: string): string[] => {
             const openChar = '[';
             const closeChar = ']';
@@ -306,7 +306,7 @@ export class MaskRouter extends Router implements IRouter {
             }
 
             const result = variations.reduce((acc: string[], variation) => {
-                acc.push(...this.#parseVarialibity(variation));
+                acc.push(...this.#parseVariety(variation));
 
                 return acc;
             }, []).filter((v, i, arr) => arr.indexOf(v) === i);
@@ -314,7 +314,7 @@ export class MaskRouter extends Router implements IRouter {
             return result;
         }
 
-        return this.#varialibityCache.load(mask, () => parse(mask));
+        return this.#varietyCache.load(mask, () => parse(mask));
     }
 
 
