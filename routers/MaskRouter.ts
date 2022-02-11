@@ -166,6 +166,14 @@ export class MaskRouter extends Router implements IRouter {
 
 
     #parseParamValues(mask: string, pathname: string): ParamValuesType | null {
+        const isValid = (value: string | null, expression: RegExp | null): boolean => {
+            if (expression === null) return true;
+            if (value === null) return false;
+
+            expression.lastIndex = 0;
+            return expression.test(value)
+        }
+
         const parse = (mask: string, pathname: string) => {
             const paramParser = this.#createParamParser(mask);
             const paramValues: ParamValuesType = new Map();
@@ -180,15 +188,6 @@ export class MaskRouter extends Router implements IRouter {
             const exec = paramParser.exec(pathname);
 
             const parsedValues = exec?.groups ?? {};
-
-            function isValid(value: string | null, expression: RegExp | null): boolean {
-                if (expression === null) return true;
-                if (value === null) return false;
-
-                expression.lastIndex = 0;
-                return expression.test(value)
-            }
-
 
             let order = 1;
             for (const [name, declaration] of paramDeclarations) {
