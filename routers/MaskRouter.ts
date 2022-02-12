@@ -67,14 +67,10 @@ export class MaskRouter extends Router implements IRouter {
         const pathname = this.#computePathname(req);
 
         const matchedMask = this.#getMatchedMask(pathname);
-        if (matchedMask === null) throw new Error("No mask matched");
-
-        if (!this.#match(pathname)) throw new Error("No mask matched");
-
-        const mask = this.#mask;
+        if (matchedMask === null || !this.#match(pathname)) throw new Error("No mask matched");
 
         const params: Record<string, string> = {};
-        const paramValues = this.#parseParamValues(mask, pathname);
+        const paramValues = this.#parseParamValues(this.#mask, matchedMask, pathname);
 
         if (paramValues === null) {
             throw new Error("No param values parsed");
@@ -118,7 +114,7 @@ export class MaskRouter extends Router implements IRouter {
             const paramDeclarations = this.#parseParamDeclarations(mask);
             if (paramDeclarations === null) return true;
 
-            const paramValues = this.#parseParamValues(mask, pathname);
+            const paramValues = this.#parseParamValues(mask, mask, pathname);
             if (paramValues === null) return false;
 
             return Array.from(paramValues.values()).every(({ valid }) => valid);
@@ -171,7 +167,7 @@ export class MaskRouter extends Router implements IRouter {
     }
 
 
-    #parseParamValues(mask: string, pathname: string): ParamValuesType | null {
+    #parseParamValues(primaryMask: string, matchedMask: string, pathname: string): ParamValuesType | null {
         const isValid = (value: string | null, expression: RegExp | null): boolean => {
             if (expression === null) return true;
             if (value === null) return false;
@@ -180,11 +176,11 @@ export class MaskRouter extends Router implements IRouter {
             return expression.test(value)
         }
 
-        const parse = (mask: string, pathname: string) => {
-            const paramParser = this.#createParamParser(mask);
+        const parse = (primaryMask: string, matchedMask: string, pathname: string) => {
+            const paramParser = this.#createParamParser(matchedMask);
             const paramValues: ParamValuesType = new Map();
 
-            const paramDeclarations = this.#parseParamDeclarations(mask);
+            const paramDeclarations = this.#parseParamDeclarations(primaryMask);
             if (paramDeclarations === null) return paramValues;
 
             paramParser.lastIndex = 0;
@@ -210,7 +206,7 @@ export class MaskRouter extends Router implements IRouter {
             return paramValues;
         }
 
-        return this.#paramValuesCache.load(`${mask}|${pathname}`, () => parse(mask, pathname));
+        return this.#paramValuesCache.load(`${primaryMask}|${matchedMask}|${pathname}`, () => parse(primaryMask, matchedMask, pathname));
     }
 
 
