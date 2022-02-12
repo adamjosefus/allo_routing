@@ -143,6 +143,14 @@ Deno.test("MaskRouter::parseParams", async () => {
                 presenter: "homepage",
             },
         },
+        {
+            mask: "[<presenter=homepage>[/<action=default>]]",
+            pathname: "",
+            expectation: {
+                presenter: "homepage",
+                action: "default",
+            },
+        },
     ];
 
 
