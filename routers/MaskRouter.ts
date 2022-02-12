@@ -32,15 +32,18 @@ import { RouterMalformedException } from "./RouterMalformedException.ts";
  */
 export class MaskRouter extends Router implements IRouter {
 
-    readonly #maskVariants: readonly string[];
     readonly #mask: string;
+    readonly #maskVariants: readonly string[];
     readonly #serveResponse: ServeResponseType;
     readonly #options: Required<RouterOptions>;
 
+    readonly #varibleOpenChar = '[';
+    readonly #varibleCloseChar = ']';
     readonly #maskParser = /\<(?<name>[a-z][A-z0-9]*)(=(?<defaultValue>.+?))?\s*(\s+(?<expression>.+?))?\>/g;
 
-    readonly #matchCache = new Cache<boolean>();
+    readonly #maskCache = new Cache<string>();
     readonly #variantCache = new Cache<string[]>();
+    readonly #matchCache = new Cache<boolean>();
     readonly #paramParserCache = new Cache<RegExp>();
     readonly #paramDeclarationCache = new Cache<ParamDeclarationsType>();
     readonly #paramValuesCache = new Cache<ParamValuesType | null>();
@@ -226,8 +229,8 @@ export class MaskRouter extends Router implements IRouter {
 
     #parseVariants(mask: string): string[] {
         const parse = (mask: string): string[] => {
-            const openChar = '[';
-            const closeChar = ']';
+            const openChar = this.#varibleOpenChar;
+            const closeChar = this.#varibleCloseChar;
 
             type RangeType = {
                 open: number,
@@ -318,9 +321,16 @@ export class MaskRouter extends Router implements IRouter {
 
 
     #parseMask(mask: string): string {
-        // TODO: Add cache
+        const parse = (mask: string): string => {
+            const openChar = this.#varibleOpenChar;
+            const closeChar = this.#varibleCloseChar;
 
-        return MaskRouter.cleanPathname(mask).replaceAll('[', '').replaceAll(']', '');
+            return MaskRouter.cleanPathname(mask)
+                .replaceAll(openChar, '')
+                .replaceAll(closeChar, '');
+        }
+
+        return this.#maskCache.load(mask, () => parse(mask));
     }
 
 
