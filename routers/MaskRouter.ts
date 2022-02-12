@@ -33,6 +33,7 @@ import { RouterMalformedException } from "./RouterMalformedException.ts";
 export class MaskRouter extends Router implements IRouter {
 
     readonly #masks: readonly string[];
+    readonly #primaryMask: string;
     readonly #serveResponse: ServeResponseType;
     readonly #options: Required<RouterOptions>;
 
@@ -48,7 +49,10 @@ export class MaskRouter extends Router implements IRouter {
     constructor(mask: string, serveResponse: ServeResponseType, options?: RouterOptions) {
         super();
 
-        this.#masks = this.#parseVariety(MaskRouter.cleanPathname(mask));
+        const masks = this.#parseVariety(MaskRouter.cleanPathname(mask))
+
+        this.#masks = masks;
+        this.#primaryMask = masks.reduce((a, b) => a.length > b.length ? a : b);
         this.#serveResponse = serveResponse;
         this.#options = createRequiredOptions(options);
     }
@@ -63,9 +67,13 @@ export class MaskRouter extends Router implements IRouter {
 
     async serveResponse(req: Request): Promise<Response> {
         const pathname = this.#computePathname(req);
-        const mask = this.#getMatchedMask(pathname);
 
-        if (mask === null) throw new Error("No mask matched");
+        // const mask = this.#getMatchedMask(pathname);
+        // if (mask === null) throw new Error("No mask matched");
+
+        if (!this.#match(pathname)) throw new Error("No mask matched");
+
+        const mask = this.#primaryMask;
 
         const params: Record<string, string> = {};
         const paramValues = this.#parseParamValues(mask, pathname);
@@ -177,9 +185,6 @@ export class MaskRouter extends Router implements IRouter {
         const parse = (mask: string, pathname: string) => {
             const paramParser = this.#createParamParser(mask);
             const paramValues: ParamValuesType = new Map();
-
-            paramParser.lastIndex = 0;
-            if (!paramParser.test(pathname)) return null;
 
             const paramDeclarations = this.#parseParamDeclarations(mask);
             if (paramDeclarations === null) return paramValues;
