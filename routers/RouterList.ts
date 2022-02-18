@@ -11,6 +11,12 @@ import { RegExpRouter } from "./RegExpRouter.ts";
 import { MaskRouter } from "./MaskRouter.ts";
 
 
+type AddMethodEntry =
+    | [mask: string, serveResponse: ServeResponseType]
+    | [pattern: URLPattern, serveResponse: ServeResponseType]
+    | [regexp: RegExp, serveResponse: ServeResponseType];
+
+
 /**
  * Class `RouterList` is main object. Contains all routers.
  * 
@@ -66,23 +72,25 @@ export class RouterList implements IRouter {
      *  It will be used as *regexp* for `RegExpRouter`.
      * 
      */
-    add(entry: string | URLPattern | RegExp, serveResponse: ServeResponseType): void {
-        if (typeof entry === "string") {
-            this.#addMaskRoute(entry, serveResponse);
+    add(...entry: AddMethodEntry): void {
+        const [route, serveResponse] = entry;
+
+        if (typeof route === "string") {
+            this.#addMaskRoute(route, serveResponse);
             return;
         }
 
-        if (entry instanceof URLPattern) {
-            this.#addPatternRoute(entry, serveResponse);
+        if (route instanceof URLPattern) {
+            this.#addPatternRoute(route, serveResponse);
             return;
         }
 
-        if (entry instanceof RegExp) {
-            this.#addRegExpRoute(entry, serveResponse);
+        if (route instanceof RegExp) {
+            this.#addRegExpRoute(route, serveResponse);
             return;
         }
 
-        throw new Error("Invalid entry");
+        throw new Error("Invalid route.");
     }
 
 

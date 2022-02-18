@@ -3,7 +3,7 @@
  */
 
 
-import { Cache } from "https://deno.land/x/allo_caching@v1.0.0/mod.ts";
+import { Cache } from "https://deno.land/x/allo_caching@v1.0.2/mod.ts";
 import { type IRouter } from "../types/IRouter.ts";
 import { Router } from "./Router.ts";
 import { type ServeResponseType } from "../types/ServeResponseType.ts";
