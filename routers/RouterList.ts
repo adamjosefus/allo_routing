@@ -153,14 +153,15 @@ export class RouterList implements IRouter {
     }
 
 
-    async getErrorReponse(req: Request, status: Status | number): Promise<Response> {
+    async getErrorReponse(status: Status | number, req: Request, params: Record<string, string> = {}): Promise<Response> {
         const serveResponse = this.#errors.get(status);
         const phrase = getReasonPhrase(status);
 
         if (serveResponse) {
             return await serveResponse(req, {
                 status: status.toString(),
-                phrase
+                phrase,
+                ...params,
             });
 
         } else {
