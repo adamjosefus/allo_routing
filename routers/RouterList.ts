@@ -5,6 +5,7 @@
 
 import { type IRouter } from "../types/IRouter.ts";
 import { type RouterOptions, createRequiredOptions } from "../helpers/RouterOptions.ts";
+import { type Status, getReasonPhrase } from "../helpers/Status.ts";
 import { ServeResponseType } from "../types/ServeResponseType.ts";
 import { PatternRouter } from "./PatternRouter.ts";
 import { RegExpRouter } from "./RegExpRouter.ts";
@@ -37,6 +38,8 @@ export class RouterList implements IRouter {
         match(req: Request): Promise<boolean>;
         serveResponse(req: Request): Promise<Response>;
     }[] = [];
+
+    readonly #errors: Map<number, ServeResponseType> = new Map();
 
 
     constructor(options?: RouterOptions) {
@@ -136,5 +139,33 @@ export class RouterList implements IRouter {
         }
 
         return null;
+    }
+
+
+    setError(status: Status | number, serveResponse: ServeResponseType): void {
+        if (Number.isInteger(status)) {
+            throw new Error("Status must be integer.");
+        }
+
+        this.#errors.set(status, serveResponse);
+    }
+
+
+    async getErrorReponse(req: Request, status: Status | number): Promise<Response> {
+        const serveResponse = this.#errors.get(status);
+        const phrase = getReasonPhrase(status);
+
+        if (serveResponse) {
+            return await serveResponse(req, {
+                status: status.toString(),
+                phrase
+            });
+
+        } else {
+            return new Response(`${status}\n${phrase}`, {
+                headers: { "Content-Type": "text/plain" },
+                status,
+            });
+        }
     }
 }
