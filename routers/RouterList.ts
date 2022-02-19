@@ -5,7 +5,7 @@
 
 import { type IRouter } from "../types/IRouter.ts";
 import { type RouterOptions, createRequiredOptions } from "../helpers/RouterOptions.ts";
-import { type Status, getReasonPhrase } from "../helpers/Status.ts";
+import { Status, getReasonPhrase } from "../helpers/Status.ts";
 import { ServeResponseType } from "../types/ServeResponseType.ts";
 import { PatternRouter } from "./PatternRouter.ts";
 import { RegExpRouter } from "./RegExpRouter.ts";
@@ -125,7 +125,9 @@ export class RouterList implements IRouter {
     async serveResponse(req: Request): Promise<Response> {
         const router = await this.#matchRouter(req);
 
-        if (!router) throw new Error("Router not found");
+        if (!router) {
+            return await this.getErrorReponse(req, Status.S404_NotFound);
+        }
 
         return await router.serveResponse(req);
     }
