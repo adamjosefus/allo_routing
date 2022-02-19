@@ -126,7 +126,7 @@ export class RouterList implements IRouter {
         const router = await this.#matchRouter(req);
 
         if (!router) {
-            return await this.getErrorReponse(req, Status.S404_NotFound);
+            return await this.getErrorReponse(Status.S404_NotFound, req);
         }
 
         return await router.serveResponse(req);
