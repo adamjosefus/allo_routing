@@ -143,7 +143,12 @@ export class MaskRouter extends Router implements IRouter {
                 };
 
                 const name = groups.name;
-                const defaultValue = groups.defaultValue ?? null;
+
+                const defaultValue = (v => {
+                    if (v !== null && v !== '') return v;
+                    return null;
+                })(groups.defaultValue?.trim() ?? null);
+
                 const expression = (v => {
                     if (v !== null) {
                         try {

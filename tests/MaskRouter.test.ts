@@ -151,6 +151,12 @@ Deno.test("MaskRouter::parseParams", async () => {
                 action: "default",
             },
         },
+        {
+            mask: "[<s= >]",
+            pathname: "",
+            expectation: {
+            },
+        },
     ];
 
 
