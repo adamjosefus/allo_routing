@@ -144,7 +144,7 @@ export class RouterList implements IRouter {
     }
 
 
-    setError(status: Status | number, serveResponse: ServeResponseType): void {
+    setError(status: number, serveResponse: ServeResponseType): void {
         if (Number.isInteger(status)) {
             throw new Error("Status must be integer.");
         }
@@ -153,7 +153,7 @@ export class RouterList implements IRouter {
     }
 
 
-    async getErrorReponse(status: Status | number, req: Request, params: Record<string, string> = {}): Promise<Response> {
+    async getErrorReponse(status: number, req: Request, params: Record<string, string> = {}): Promise<Response> {
         const serveResponse = this.#errors.get(status);
         const phrase = getReasonPhrase(status);
 

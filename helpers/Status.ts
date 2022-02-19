@@ -62,7 +62,7 @@ export const enum Status {
 }
 
 
-export function getReasonPhrase(status: Status | number): string {
+export function getReasonPhrase(status: number): string {
     switch (status) {
         case Status.S100_Continue:
             return 'Continue';
