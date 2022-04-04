@@ -46,7 +46,6 @@ export class RouterList implements IRouter {
         this.#options = createRequiredOptions(options);
     }
 
-
     /**
      * Adds router to list. Router must implement `IRouter` interface.
      * Router can be your custom class or instance of `PatternRouter`, `MaskRouter` or `RegExpRouter`.
@@ -134,8 +133,10 @@ export class RouterList implements IRouter {
 
 
     async #matchRouter(req: Request): Promise<IRouter | null> {
+        const commonMatch = await this.#options.commonMatch(req);
+
         for (const router of this.#routers) {
-            const match = await router.match(req);
+            const match = commonMatch && await router.match(req);
 
             if (match) return router;
         }
