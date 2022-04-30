@@ -13,6 +13,7 @@ import { MaskRouter } from "./MaskRouter.ts";
 
 
 type AddMethodEntry =
+    | [router: IRouter]
     | [mask: string, serveResponse: ServeResponseType]
     | [pattern: URLPattern, serveResponse: ServeResponseType]
     | [regexp: RegExp, serveResponse: ServeResponseType];
@@ -46,71 +47,69 @@ export class RouterList implements IRouter {
         this.#options = createRequiredOptions(options);
     }
 
+
     /**
-     * Adds router to list. Router must implement `IRouter` interface.
-     * Router can be your custom class or instance of `PatternRouter`, `MaskRouter` or `RegExpRouter`.
-     * 
-     * Btw, also you can add another instance of `RouterList` too.
+     * @deprecated Use `add` method instead.
      */
     addRouter(router: IRouter): void {
-        // Force transform to return promises. 
+        this.add(router);
+    }
+
+
+    /**
+     * Add route or router to list.
+     * 
+     * @returns Returns `this` for chaining.
+     */
+    add(...entry: AddMethodEntry): this {
+        if (entry.length === 1) {
+            return this.#addRouter(entry[0]);
+        }
+
+        const [route, serveResponse] = entry;
+
+        if (typeof route === "string") {
+            return this.#addMaskRoute(route, serveResponse);
+        }
+
+        if (route instanceof URLPattern) {
+            return this.#addPatternRoute(route, serveResponse);
+        }
+
+        if (route instanceof RegExp) {
+            return this.#addRegExpRoute(route, serveResponse);
+        }
+
+        throw new Error("Invalid route type.");
+    }
+
+
+    #addRouter(router: IRouter): this {
+        // Force transform to returning promises. 
         const match = async (req: Request) => await router.match(req);
         const serveResponse = async (req: Request) => await router.serveResponse(req);
 
         this.#routers.push({ match, serveResponse });
+
+        return this;
     }
 
 
-    /**
-     * Adds new instance of router depending on `entry` argument.
-     * 
-     * - If is type of `string`.
-     *  It will be used as *mask* for `MaskRouter`.
-     * 
-     * - If is type of `URLPattern`.
-     *  It will be used as *pattern* for `PatternRouter`.
-     * 
-     * - If is type of `RegExp`.
-     *  It will be used as *regexp* for `RegExpRouter`.
-     * 
-     */
-    add(...entry: AddMethodEntry): void {
-        const [route, serveResponse] = entry;
-
-        if (typeof route === "string") {
-            this.#addMaskRoute(route, serveResponse);
-            return;
-        }
-
-        if (route instanceof URLPattern) {
-            this.#addPatternRoute(route, serveResponse);
-            return;
-        }
-
-        if (route instanceof RegExp) {
-            this.#addRegExpRoute(route, serveResponse);
-            return;
-        }
-
-        throw new Error("Invalid route.");
-    }
-
-
-    #addMaskRoute(mask: string, serveResponse: ServeResponseType): void {
+    #addMaskRoute(mask: string, serveResponse: ServeResponseType): this {
         const router = new MaskRouter(mask, serveResponse, this.#options);
-        this.addRouter(router);
+        return this.#addRouter(router);
     }
 
 
-    #addPatternRoute(pattern: URLPattern, serveResponse: ServeResponseType): void {
+    #addPatternRoute(pattern: URLPattern, serveResponse: ServeResponseType): this {
         const router = new PatternRouter(pattern, serveResponse, this.#options);
-        this.addRouter(router);
+        return this.#addRouter(router);
     }
 
 
-    #addRegExpRoute(regexp: RegExp, serveResponse: ServeResponseType): void {
+    #addRegExpRoute(regexp: RegExp, serveResponse: ServeResponseType): this {
         const router = new RegExpRouter(regexp, serveResponse, this.#options);
-        this.addRouter(router);
+        return this.#addRouter(router);
     }
 
 
