@@ -133,11 +133,11 @@ export class RouterList implements IRouter {
 
 
     async #matchRouter(req: Request): Promise<IRouter | null> {
-        const commonMatch = await this.#options.commonMatch(req);
+        const initialCondition = await this.#options.initialCondition(req);
+        if (!initialCondition) return null;
 
         for (const router of this.#routers) {
-            const match = commonMatch && await router.match(req);
-
+            const match = await router.match(req);
             if (match) return router;
         }
 
