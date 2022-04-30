@@ -25,7 +25,7 @@ export type RouterOptions = {
      * ```
      */
     tranformPathname?: (pathname: string) => string;
-    commonMatch?: (req: Request) => boolean | Promise<boolean>;
+    initialCondition?: (req: Request) => boolean | Promise<boolean>;
 }
 
 
@@ -36,11 +36,11 @@ export type RouterOptions = {
 export function createRequiredOptions(options?: RouterOptions): Required<RouterOptions> {
     const fallback: Required<RouterOptions> = {
         tranformPathname: (pathname) => pathname,
-        commonMatch: (_req) => true,
+        initialCondition: (_req) => true,
     }
 
     return {
         tranformPathname: options?.tranformPathname ?? fallback.tranformPathname,
-        commonMatch: options?.commonMatch ?? fallback.commonMatch,
+        initialCondition: options?.initialCondition ?? options?.initialCondition ?? fallback.initialCondition,
     }
 }
