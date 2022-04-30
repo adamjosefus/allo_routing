@@ -4,9 +4,7 @@
 
 
 import type { IRouter } from "../types/IRouter.ts";
-
-
-export const pipe = <T>(...fns: Array<(arg: T) => T>) => (value: T) => fns.reduce((acc, fn) => fn(acc), value);
+import { pipe } from "../helpers/pipe.ts";
 
 
 const removeStartSlash = (s: string) => {

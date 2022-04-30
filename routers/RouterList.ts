@@ -2,7 +2,7 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-
+import { pipe } from "../helpers/pipe.ts";
 import { type IRouter } from "../types/IRouter.ts";
 import { type RouterOptions, createRequiredOptions } from "../helpers/RouterOptions.ts";
 import { Status, getReasonPhrase } from "../helpers/Status.ts";
