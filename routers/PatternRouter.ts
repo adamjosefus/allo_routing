@@ -73,11 +73,12 @@ export class PatternRouter extends Router implements IRouter {
     static mergeGroups(result: URLPatternResult | null): Record<string, string> {
         if (result === null) return {};
 
-        function clean(group: Record<string, string>): Record<string, string> {
+        function clean(group: Record<string, string | undefined>): Record<string, string> {
             const params: Record<string, string> = {};
 
             for (const [key, value] of Object.entries(group)) {
                 if (Number.isInteger(Number(key))) continue;
+                if (value === undefined) continue;
 
                 params[key] = value;
             }
