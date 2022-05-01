@@ -3,7 +3,7 @@
  */
 
 
-import { assertEquals } from "https://deno.land/std@0.133.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.137.0/testing/asserts.ts";
 import { RegExpRouter } from "../routers/RegExpRouter.ts";
 
 
