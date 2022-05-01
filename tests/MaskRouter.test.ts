@@ -2,8 +2,7 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-
-import { assertEquals } from "https://deno.land/std@0.133.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.137.0/testing/asserts.ts";
 import { MaskRouter } from "../routers/MaskRouter.ts";
 
 

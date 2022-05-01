@@ -2,7 +2,6 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-
 import { Cache } from "https://deno.land/x/allo_caching@v1.2.0/mod.ts";
 import { ServeResponseType } from "../types/ServeResponseType.ts";
 import { type IRouter } from "../types/IRouter.ts";
@@ -30,7 +29,7 @@ export class PatternRouter extends Router implements IRouter {
         super();
 
         this.#pattern = typeof pattern === "string"
-            ? new URLPattern({ pathname: `/${PatternRouter.cleanPathname(pattern)}` })
+            ? new URLPattern({ pathname: `/${Router.cleanPathname(pattern)}` })
             : pattern;
         this.#serveResponse = serveResponse;
         this.#options = createRequiredOptions(options);
@@ -59,7 +58,7 @@ export class PatternRouter extends Router implements IRouter {
             const oldUrl = new URL(url);
             const pathname = this.#options.tranformPathname(oldUrl.pathname);
 
-            const newUrl = new URL(PatternRouter.cleanPathname(pathname), oldUrl.origin);
+            const newUrl = new URL(Router.cleanPathname(pathname), oldUrl.origin);
             newUrl.port = oldUrl.port;
             newUrl.username = oldUrl.username;
             newUrl.password = oldUrl.password;

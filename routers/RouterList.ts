@@ -2,17 +2,19 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-
+import { pipe } from "../helpers/pipe.ts";
 import { type IRouter } from "../types/IRouter.ts";
 import { type RouterOptions, createRequiredOptions } from "../helpers/RouterOptions.ts";
 import { Status, getReasonPhrase } from "../helpers/Status.ts";
 import { ServeResponseType } from "../types/ServeResponseType.ts";
+import { Router } from "./Router.ts";
 import { PatternRouter } from "./PatternRouter.ts";
 import { RegExpRouter } from "./RegExpRouter.ts";
 import { MaskRouter } from "./MaskRouter.ts";
 
 
 type AddMethodEntry =
+    | [router: IRouter]
     | [mask: string, serveResponse: ServeResponseType]
     | [pattern: URLPattern, serveResponse: ServeResponseType]
     | [regexp: RegExp, serveResponse: ServeResponseType];
@@ -46,71 +48,113 @@ export class RouterList implements IRouter {
         this.#options = createRequiredOptions(options);
     }
 
+
     /**
-     * Adds router to list. Router must implement `IRouter` interface.
-     * Router can be your custom class or instance of `PatternRouter`, `MaskRouter` or `RegExpRouter`.
-     * 
-     * Btw, also you can add another instance of `RouterList` too.
+     * @deprecated Use `add` method instead.
      */
     addRouter(router: IRouter): void {
-        // Force transform to return promises. 
+        this.add(router);
+    }
+
+
+    startsWith(path: string): RouterList {
+        const searchString = Router.cleanPathname(path);
+
+        const child = (() => {
+            const tranformPathname = (pathname: string) => {
+                return pipe<string>(
+                    (s) => this.#options.tranformPathname(s),
+                    (s) => Router.cleanPathname(s).slice(searchString.length),
+                )(pathname);
+            };
+
+            return new RouterList({
+                tranformPathname
+            });
+        })();
+
+        const parent = (() => {
+            const tranformPathname = (pathname: string) => {
+                return this.#options.tranformPathname(pathname);
+            }
+
+            const initialCondition = (req: Request) => {
+                const url = new URL(req.url);
+                const pathname = pipe(
+                    tranformPathname,
+                    Router.cleanPathname,
+                )(url.pathname);
+
+                return pathname.startsWith(searchString);
+            }
+
+            return new RouterList({
+                tranformPathname,
+                initialCondition,
+            });
+        })();
+
+        parent.add(child);
+        this.add(parent);
+
+        return child;
+    }
+
+
+    /**
+     * Add route or router to list.
+     * 
+     * @returns Returns `this` for chaining.
+     */
+    add(...entry: AddMethodEntry): this {
+        if (entry.length === 1) {
+            return this.#addRouter(entry[0]);
+        }
+
+        const [route, serveResponse] = entry;
+
+        if (typeof route === "string") {
+            return this.#addMaskRoute(route, serveResponse);
+        }
+
+        if (route instanceof URLPattern) {
+            return this.#addPatternRoute(route, serveResponse);
+        }
+
+        if (route instanceof RegExp) {
+            return this.#addRegExpRoute(route, serveResponse);
+        }
+
+        throw new Error("Invalid route type.");
+    }
+
+
+    #addRouter(router: IRouter): this {
+        // Force transform to returning promises. 
         const match = async (req: Request) => await router.match(req);
         const serveResponse = async (req: Request) => await router.serveResponse(req);
 
         this.#routers.push({ match, serveResponse });
+
+        return this;
     }
 
 
-    /**
-     * Adds new instance of router depending on `entry` argument.
-     * 
-     * - If is type of `string`.
-     *  It will be used as *mask* for `MaskRouter`.
-     * 
-     * - If is type of `URLPattern`.
-     *  It will be used as *pattern* for `PatternRouter`.
-     * 
-     * - If is type of `RegExp`.
-     *  It will be used as *regexp* for `RegExpRouter`.
-     * 
-     */
-    add(...entry: AddMethodEntry): void {
-        const [route, serveResponse] = entry;
-
-        if (typeof route === "string") {
-            this.#addMaskRoute(route, serveResponse);
-            return;
-        }
-
-        if (route instanceof URLPattern) {
-            this.#addPatternRoute(route, serveResponse);
-            return;
-        }
-
-        if (route instanceof RegExp) {
-            this.#addRegExpRoute(route, serveResponse);
-            return;
-        }
-
-        throw new Error("Invalid route.");
-    }
-
-
-    #addMaskRoute(mask: string, serveResponse: ServeResponseType): void {
+    #addMaskRoute(mask: string, serveResponse: ServeResponseType): this {
         const router = new MaskRouter(mask, serveResponse, this.#options);
-        this.addRouter(router);
+        return this.#addRouter(router);
     }
 
 
-    #addPatternRoute(pattern: URLPattern, serveResponse: ServeResponseType): void {
+    #addPatternRoute(pattern: URLPattern, serveResponse: ServeResponseType): this {
         const router = new PatternRouter(pattern, serveResponse, this.#options);
-        this.addRouter(router);
+        return this.#addRouter(router);
     }
 
 
-    #addRegExpRoute(regexp: RegExp, serveResponse: ServeResponseType): void {
+    #addRegExpRoute(regexp: RegExp, serveResponse: ServeResponseType): this {
         const router = new RegExpRouter(regexp, serveResponse, this.#options);
-        this.addRouter(router);
+        return this.#addRouter(router);
     }
 
 
@@ -133,11 +177,11 @@ export class RouterList implements IRouter {
 
 
     async #matchRouter(req: Request): Promise<IRouter | null> {
-        const commonMatch = await this.#options.commonMatch(req);
+        const initialCondition = await this.#options.initialCondition(req);
+        if (!initialCondition) return null;
 
         for (const router of this.#routers) {
-            const match = commonMatch && await router.match(req);
-
+            const match = await router.match(req);
             if (match) return router;
         }
 

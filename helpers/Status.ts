@@ -1,3 +1,7 @@
+/**
+ * @copyright Copyright (c) 2022 Adam Josefus
+ */
+
 // deno-lint-ignore-file camelcase
 export const enum Status {
     S100_Continue = 100,
