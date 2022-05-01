@@ -7,6 +7,7 @@ import { type IRouter } from "../types/IRouter.ts";
 import { type RouterOptions, createRequiredOptions } from "../helpers/RouterOptions.ts";
 import { Status, getReasonPhrase } from "../helpers/Status.ts";
 import { ServeResponseType } from "../types/ServeResponseType.ts";
+import { Router } from "./Router.ts";
 import { PatternRouter } from "./PatternRouter.ts";
 import { RegExpRouter } from "./RegExpRouter.ts";
 import { MaskRouter } from "./MaskRouter.ts";
@@ -53,6 +54,50 @@ export class RouterList implements IRouter {
      */
     addRouter(router: IRouter): void {
         this.add(router);
+    }
+
+
+    startsWith(path: string): RouterList {
+        const searchString = Router.cleanPathname(path);
+
+        const child = (() => {
+            const tranformPathname = (pathname: string) => {
+                return pipe<string>(
+                    (s) => this.#options.tranformPathname(s),
+                    (s) => Router.cleanPathname(s).slice(searchString.length),
+                )(pathname);
+            };
+
+            return new RouterList({
+                tranformPathname
+            });
+        })();
+
+        const parent = (() => {
+            const tranformPathname = (pathname: string) => {
+                return this.#options.tranformPathname(pathname);
+            }
+
+            const initialCondition = (req: Request) => {
+                const url = new URL(req.url);
+                const pathname = pipe(
+                    tranformPathname,
+                    Router.cleanPathname,
+                )(url.pathname);
+
+                return pathname.startsWith(searchString);
+            }
+
+            return new RouterList({
+                tranformPathname,
+                initialCondition,
+            });
+        })();
+
+        parent.add(child);
+        this.add(parent);
+
+        return child;
     }
 
 
