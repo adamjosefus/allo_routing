@@ -2,7 +2,6 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-
 export type RouterOptions = {
     /**
      * Transform `pathname` to new shape.

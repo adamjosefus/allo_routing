@@ -2,7 +2,6 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-
 import { Cache } from "https://deno.land/x/allo_caching@v1.2.0/mod.ts";
 import { ServeResponseType } from "../types/ServeResponseType.ts";
 import { type IRouter } from "../types/IRouter.ts";

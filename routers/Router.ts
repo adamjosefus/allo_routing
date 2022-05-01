@@ -2,7 +2,6 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-
 import type { IRouter } from "../types/IRouter.ts";
 import { pipe } from "../helpers/pipe.ts";
 

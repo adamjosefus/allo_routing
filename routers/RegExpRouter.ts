@@ -2,7 +2,6 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-
 import { ServeResponseType } from "../types/ServeResponseType.ts";
 import { type IRouter } from "../types/IRouter.ts";
 import { Router } from "./Router.ts";
