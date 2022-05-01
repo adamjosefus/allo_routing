@@ -321,7 +321,7 @@ export class MaskRouter extends Router implements IRouter {
             return result;
         }
 
-        return this.#variantCache.load(mask, () => parse(MaskRouter.cleanPathname(mask)));
+        return this.#variantCache.load(mask, () => parse(Router.cleanPathname(mask)));
     }
 
 
@@ -330,7 +330,7 @@ export class MaskRouter extends Router implements IRouter {
             const openChar = this.#varibleOpenChar;
             const closeChar = this.#varibleCloseChar;
 
-            return MaskRouter.cleanPathname(mask)
+            return Router.cleanPathname(mask)
                 .replaceAll(openChar, '')
                 .replaceAll(closeChar, '');
         }
@@ -343,6 +343,6 @@ export class MaskRouter extends Router implements IRouter {
         const url = new URL(req.url);
         const pathname = this.#options.tranformPathname(url.pathname);
 
-        return MaskRouter.cleanPathname(pathname);
+        return Router.cleanPathname(pathname);
     }
 }

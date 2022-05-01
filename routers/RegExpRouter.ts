@@ -34,6 +34,7 @@ export class RegExpRouter extends Router implements IRouter {
     match(req: Request): boolean {
         const pathname = this.#computePathname(req);
 
+        this.#regexp.lastIndex = 0;
         return this.#regexp.test(pathname);
     }
 
@@ -53,6 +54,6 @@ export class RegExpRouter extends Router implements IRouter {
         const url = new URL(req.url);
         const pathname = this.#options.tranformPathname(url.pathname);
 
-        return RegExpRouter.cleanPathname(pathname);
+        return Router.cleanPathname(pathname);
     }
 }
