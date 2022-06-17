@@ -190,7 +190,7 @@ export class RouterList implements IRouter {
 
 
     setError(status: number, serveResponse: ServeResponseType): void {
-        if (Number.isInteger(status)) {
+        if (!Number.isInteger(status)) {
             throw new Error("Status must be integer.");
         }
 
