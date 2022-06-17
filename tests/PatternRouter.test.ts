@@ -2,7 +2,7 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-import { assertEquals } from "https://deno.land/std@0.137.0/testing/asserts.ts";
+import { assertEquals } from "../libs/testing_asserts.ts";
 import { PatternRouter } from "../routers/PatternRouter.ts";
 
 
