@@ -41,7 +41,8 @@ export class RouterList implements IRouter {
         serveResponse(req: Request): Promise<Response>;
     }[] = [];
 
-    readonly #errors: Map<number, ServeResponseType> = new Map();
+
+    #errorServeResponse: ServeResponseType | null = null;
 
 
     constructor(options?: RouterOptions) {
@@ -189,17 +190,13 @@ export class RouterList implements IRouter {
     }
 
 
-    setError(status: number, serveResponse: ServeResponseType): void {
-        if (Number.isInteger(status)) {
-            throw new Error("Status must be integer.");
-        }
-
-        this.#errors.set(status, serveResponse);
+    setError(serveResponse: ServeResponseType): void {
+        this.#errorServeResponse = serveResponse;
     }
 
 
     async getErrorReponse(status: number, req: Request, params: Record<string, string> = {}): Promise<Response> {
-        const serveResponse = this.#errors.get(status);
+        const serveResponse = this.#errorServeResponse;
         const phrase = getReasonPhrase(status);
 
         if (serveResponse) {

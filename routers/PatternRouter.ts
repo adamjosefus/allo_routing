@@ -2,7 +2,7 @@
  * @copyright Copyright (c) 2022 Adam Josefus
  */
 
-import { Cache } from "https://deno.land/x/allo_caching@v1.2.0/mod.ts";
+import { Cache } from "../libs/allo_caching.ts";
 import { ServeResponseType } from "../types/ServeResponseType.ts";
 import { type IRouter } from "../types/IRouter.ts";
 import { Router } from "./Router.ts";
@@ -73,11 +73,12 @@ export class PatternRouter extends Router implements IRouter {
     static mergeGroups(result: URLPatternResult | null): Record<string, string> {
         if (result === null) return {};
 
-        function clean(group: Record<string, string>): Record<string, string> {
+        function clean(group: Record<string, string | undefined>): Record<string, string> {
             const params: Record<string, string> = {};
 
             for (const [key, value] of Object.entries(group)) {
                 if (Number.isInteger(Number(key))) continue;
+                if (value === undefined) continue;
 
                 params[key] = value;
             }
