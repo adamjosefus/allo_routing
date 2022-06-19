@@ -8,7 +8,7 @@ import { Router } from "./Router.ts";
 import { type ServeResponseType } from "../types/ServeResponseType.ts";
 import { type RouterOptions, createRequiredOptions } from "../helpers/RouterOptions.ts";
 import { type ParamDeclarationsType } from "../types/ParamDeclarationsType.ts";
-import { type ParamValuesType } from "../types/ParamValuesType.ts";
+import { type ParsedParamValues } from "../types/ParsedParamValues.ts";
 import { RouterMalformedException } from "./RouterMalformedException.ts";
 
 
@@ -45,7 +45,7 @@ export class MaskRouter extends Router implements IRouter {
     readonly #matchCache = new Cache<boolean>();
     readonly #paramParserCache = new Cache<RegExp>();
     readonly #paramDeclarationCache = new Cache<ParamDeclarationsType>();
-    readonly #paramValuesCache = new Cache<ParamValuesType | null>();
+    readonly #paramValuesCache = new Cache<ParsedParamValues | null>();
 
 
     constructor(mask: string, serveResponse: ServeResponseType, options?: RouterOptions) {
@@ -174,7 +174,7 @@ export class MaskRouter extends Router implements IRouter {
     }
 
 
-    #parseParamValues(primaryMask: string, matchedMask: string, pathname: string): ParamValuesType | null {
+    #parseParamValues(primaryMask: string, matchedMask: string, pathname: string): ParsedParamValues | null {
         const isValid = (value: string | null, expression: RegExp | null): boolean => {
             if (expression === null) return true;
             if (value === null) return false;
@@ -185,7 +185,7 @@ export class MaskRouter extends Router implements IRouter {
 
         const parse = (primaryMask: string, matchedMask: string, pathname: string) => {
             const paramParser = this.#createParamParser(matchedMask);
-            const paramValues: ParamValuesType = new Map();
+            const paramValues: ParsedParamValues = new Map();
 
             const paramDeclarations = this.#parseParamDeclarations(primaryMask);
             if (paramDeclarations === null) return paramValues;
