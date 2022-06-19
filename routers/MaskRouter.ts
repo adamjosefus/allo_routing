@@ -58,17 +58,22 @@ export class MaskRouter extends Router implements IRouter {
     }
 
 
+    /**
+     * Return `true` if `pathname` of request matches `mask`.
+     */
     match(req: Request): boolean {
         const pathname = this.#computePathname(req);
-
         return this.#match(pathname)
     }
 
 
+    /**
+     * Return Response.
+     */
     async serveResponse(req: Request): Promise<Response> {
         const pathname = this.#computePathname(req);
 
-        const matchedMask = this.#getMatchedMask(pathname);
+        const matchedMask = this.#getMatchedMaskVariant(pathname);
         if (matchedMask === null || !this.#match(pathname)) throw new Error("No mask matched");
 
         const params: Record<string, string> = {};
@@ -88,6 +93,9 @@ export class MaskRouter extends Router implements IRouter {
     }
 
 
+    /**
+     * Return `true` if `pathname` matches some of `mask` variants.
+     */
     #match(pathname: string): boolean {
         const result = this.#maskVariants.some(mask => {
             return this.#matchMask(mask, pathname);
@@ -97,7 +105,10 @@ export class MaskRouter extends Router implements IRouter {
     }
 
 
-    #getMatchedMask(pathname: string): string | null {
+    /**
+     * Return matched mask variant or `null` if no mask matched.
+     */
+    #getMatchedMaskVariant(pathname: string): string | null {
         const result = this.#maskVariants.find(mask => {
             return this.#matchMask(mask, pathname);
         }) ?? null;
