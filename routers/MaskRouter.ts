@@ -51,7 +51,7 @@ export class MaskRouter extends Router implements IRouter {
     constructor(mask: string, serveResponse: ServeResponseType, options?: RouterOptions) {
         super();
 
-        this.#mask = this.#parseMask(mask);
+        this.#mask = this.#normalizeMask(mask);
         this.#maskVariants = this.#parseVariants(mask);
         this.#serveResponse = serveResponse;
         this.#options = createRequiredOptions(options);
@@ -335,7 +335,7 @@ export class MaskRouter extends Router implements IRouter {
     }
 
 
-    #parseMask(mask: string): string {
+    #normalizeMask(mask: string): string {
         const parse = (mask: string): string => {
             const openChar = this.#varibleOpenChar;
             const closeChar = this.#varibleCloseChar;
@@ -354,5 +354,18 @@ export class MaskRouter extends Router implements IRouter {
         const pathname = this.#options.tranformPathname(url.pathname);
 
         return Router.cleanPathname(pathname);
+    }
+
+
+    recontructPathname(params: Record<string, string>): string {
+        const variants = [...this.#maskVariants];
+
+        variants.forEach(mask => {
+            this.
+        })
+
+
+        
+        return "";
     }
 }

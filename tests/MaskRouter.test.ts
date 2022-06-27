@@ -163,3 +163,18 @@ Deno.test("MaskRouter::parseParams", async () => {
         await test(task);
     }
 });
+
+
+Deno.test("MaskRouter::recontructPathname", () => {
+    const mask = "<controller>/<action>/<id>";
+    const serveResponse = () => new Response();
+    const router = new MaskRouter(mask, serveResponse);
+
+    const urlPath = router.recontructPathname({
+        controller: "product",
+        action: "detail",
+        id: "abc123",
+    })
+
+    assertEquals(urlPath, "product/detail/abc123");
+});
