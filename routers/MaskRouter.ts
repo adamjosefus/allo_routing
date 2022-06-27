@@ -358,14 +358,36 @@ export class MaskRouter extends Router implements IRouter {
 
 
     recontructPathname(params: Record<string, string>): string {
-        const variants = [...this.#maskVariants];
+        const paramNames = Object.keys(params);
 
-        variants.forEach(mask => {
-            this.
-        })
+        // Find matching mask
+        const mask = this.#maskVariants.find(mask => {
+            const declaration = this.#parseParamDeclarations(mask);
+            if (declaration === null) return false;
 
+            for (const [name, properties] of declaration.entries()) {
+                // Missing param
+                if (!paramNames.includes(name) && properties.defaultValue === null) return false;
+            }
 
-        
-        return "";
+            return true;
+        });
+
+        // If mask not found, creates url query
+        if (!mask) {
+            const query = new URLSearchParams(params);
+            return query.toString();
+        }
+
+        const declaration = this.#parseParamDeclarations(mask);
+
+        this.#maskParser.lastIndex = 0;
+        const pathname = mask.replace(this.#maskParser, (_substring, _g1, _g2, _g3, _g4, _g5, _offset, _source, groups) => {
+            const name = groups.name;
+            
+            return params[name] ?? declaration?.get(name)?.defaultValue ?? '';
+        });
+
+        return pathname;
     }
 }
