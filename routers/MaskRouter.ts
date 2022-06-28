@@ -38,7 +38,7 @@ export class MaskRouter extends Router implements IRouter {
 
     readonly #varibleOpenChar = '[';
     readonly #varibleCloseChar = ']';
-    readonly #maskParser = /\<(?<name>[a-z][A-z0-9]*)(=(?<defaultValue>.+?))?\s*(\s+(?<expression>.+?))?\>/g;
+    readonly #maskParser = /\<(?<name>[a-z][A-z0-9-]*)(=(?<defaultValue>.+?))?\s*(\s+(?<expression>.+?))?\>/g;
 
     readonly #maskCache = new Cache<string>();
     readonly #variantCache = new Cache<string[]>();
