@@ -50,14 +50,6 @@ export class RouterList implements IRouter {
     }
 
 
-    /**
-     * @deprecated Use `add` method instead.
-     */
-    addRouter(router: IRouter): void {
-        this.add(router);
-    }
-
-
     startsWith(path: string): RouterList {
         const searchString = Router.cleanPathname(path);
 
@@ -99,6 +91,15 @@ export class RouterList implements IRouter {
         this.add(parent);
 
         return child;
+    }
+
+
+    // #region — Routers
+    /**
+     * @deprecated Use `add` method instead.
+     */
+    addRouter(router: IRouter): void {
+        this.add(router);
     }
 
 
@@ -157,6 +158,7 @@ export class RouterList implements IRouter {
         const router = new RegExpRouter(regexp, serveResponse, this.#options);
         return this.#addRouter(router);
     }
+    // #endregion
 
 
     async match(req: Request): Promise<boolean> {
@@ -190,6 +192,7 @@ export class RouterList implements IRouter {
     }
 
 
+    // #region — Errors
     setError(serveResponse: ServeResponseType): void {
         this.#errorServeResponse = serveResponse;
     }
@@ -213,4 +216,5 @@ export class RouterList implements IRouter {
             });
         }
     }
+    // #endregion
 }

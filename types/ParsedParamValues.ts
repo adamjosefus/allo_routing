@@ -6,7 +6,7 @@
 /**
  * @internal
  */
-export type ParamValuesType = Map<string, {
+export type ParsedParamValues = Map<string, {
     readonly order: number,
     readonly value: string | null,
     readonly valid: boolean,

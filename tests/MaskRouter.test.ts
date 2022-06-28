@@ -163,3 +163,40 @@ Deno.test("MaskRouter::parseParams", async () => {
         await test(task);
     }
 });
+
+
+Deno.test("MaskRouter::recontructPathname", () => {
+    type Task = {
+        mask: string,
+        params: Record<string, string>,
+        expectation: string,
+    }
+
+    const tasks: Task[] = [
+        {
+            expectation: 'product/detail/abc123',
+            mask: '<controller>/<action>/<id>',
+            params: {
+                controller: "product",
+                action: "detail",
+                id: "abc123",
+            }
+        },
+        {
+            expectation: 'mrkev',
+            mask: '<vegetable-name>',
+            params: {
+                "vegetable-name": "mrkev",
+            }
+        },
+    ];
+
+
+    tasks.forEach(({ mask, params, expectation }) => {
+        const serveResponse = () => new Response();
+        const router = new MaskRouter(mask, serveResponse);
+        const urlPath = router.recontructPathname(params)
+
+        assertEquals(urlPath, expectation);
+    });
+});
