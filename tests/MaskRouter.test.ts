@@ -181,7 +181,14 @@ Deno.test("MaskRouter::recontructPathname", () => {
                 action: "detail",
                 id: "abc123",
             }
-        }
+        },
+        {
+            expectation: 'mrkev',
+            mask: '<vegetable-name>',
+            params: {
+                "vegetable-name": "mrkev",
+            }
+        },
     ];
 
 
