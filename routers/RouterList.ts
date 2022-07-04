@@ -13,7 +13,7 @@ import { RegExpRouter } from "./RegExpRouter.ts";
 import { MaskRouter } from "./MaskRouter.ts";
 
 
-export type AddRouterEntry =
+type AddRouterEntry =
     | [router: IRouter]
     | [mask: string, serveResponse: ServeResponseType]
     | [pattern: URLPattern, serveResponse: ServeResponseType]
@@ -36,10 +36,7 @@ export type AddRouterEntry =
 export class RouterList implements IRouter {
 
     readonly #options: Required<RouterOptions>;
-    readonly #routers: {
-        match(req: Request): Promise<boolean>;
-        serveResponse(req: Request): Promise<Response>;
-    }[] = [];
+    readonly #routers: IRouter[] = [];
 
 
     #errorServeResponse: ServeResponseType | null = null;
@@ -95,6 +92,11 @@ export class RouterList implements IRouter {
 
 
     // #region — Routers
+    getRouter(): readonly IRouter[] {
+        return [...this.#routers]
+    }
+
+
     /**
      * Add route or router to list.
      * 
