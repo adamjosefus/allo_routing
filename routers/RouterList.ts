@@ -13,7 +13,7 @@ import { RegExpRouter } from "./RegExpRouter.ts";
 import { MaskRouter } from "./MaskRouter.ts";
 
 
-type AddMethodEntry =
+export type AddRouterEntry =
     | [router: IRouter]
     | [mask: string, serveResponse: ServeResponseType]
     | [pattern: URLPattern, serveResponse: ServeResponseType]
@@ -96,19 +96,11 @@ export class RouterList implements IRouter {
 
     // #region — Routers
     /**
-     * @deprecated Use `add` method instead.
-     */
-    addRouter(router: IRouter): void {
-        this.add(router);
-    }
-
-
-    /**
      * Add route or router to list.
      * 
      * @returns Returns `this` for chaining.
      */
-    add(...entry: AddMethodEntry): this {
+    add(...entry: AddRouterEntry): this {
         if (entry.length === 1) {
             return this.#addRouter(entry[0]);
         }
