@@ -58,6 +58,11 @@ export class MaskRouter extends Router implements IRouter {
     }
 
 
+    getMask(): string {
+        return this.#mask;
+    }
+
+
     /**
      * Return `true` if `pathname` of request matches `mask`.
      */
