@@ -47,6 +47,16 @@ export class RouterList implements IRouter {
     }
 
 
+    tranformPathname(pathname: string) {
+        return this.#options.tranformPathname(pathname);
+    }
+
+
+    async initialCondition(req: Request): Promise<boolean> {
+        return await this.#options.initialCondition(req);
+    }
+
+
     startsWith(path: string): RouterList {
         const searchString = Router.cleanPathname(path);
 
