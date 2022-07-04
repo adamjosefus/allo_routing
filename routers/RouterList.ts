@@ -92,7 +92,7 @@ export class RouterList implements IRouter {
 
 
     // #region — Routers
-    getRouter(): readonly IRouter[] {
+    getRouters(): readonly IRouter[] {
         return [...this.#routers]
     }
 
