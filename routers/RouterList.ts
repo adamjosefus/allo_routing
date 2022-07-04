@@ -96,14 +96,6 @@ export class RouterList implements IRouter {
 
     // #region — Routers
     /**
-     * @deprecated Use `add` method instead.
-     */
-    addRouter(router: IRouter): void {
-        this.add(router);
-    }
-
-
-    /**
      * Add route or router to list.
      * 
      * @returns Returns `this` for chaining.
